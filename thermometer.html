@@ -198,11 +198,7 @@ let ghost = JSON.parse(
 
 // Add distance if missing
 
-if(ghost && ghost.distance === undefined){
 
-    ghost.distance = Number(
-        (Math.random() * 1.4 + 0.1).toFixed(1)
-    );
 
 
     localStorage.setItem(
