@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<title>Spirit Investigation</title>
+
+<style>
+
+body {
+    background: radial-gradient(circle, #222 0%, #000 70%);
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin-top: 100px;
+}
+
+h1 {
+    font-size: 55px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px white;
+}
+
+.subtitle {
+    font-size: 22px;
+    color: #aaa;
+    margin-bottom: 50px;
+}
+
+button {
+    background: #111;
+    color: white;
+    border: 2px solid white;
+    border-radius: 12px;
+    padding: 20px 50px;
+    font-size: 28px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: white;
+    color: black;
+    transform: scale(1.05);
+}
+
+.box {
+    border: 1px solid #444;
+    padding: 40px;
+    width: 60%;
+    margin: auto;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.7);
+}
+
+footer {
+    margin-top: 60px;
+    color: #555;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<audio id="backgroundNoise" autoplay loop muted>
+
+    <source src="ambience.mp3" type="audio/mpeg">
+
+</audio>
+
+
+
+<div class="box">
+
+
+<h1>👻 Spirit Investigation</h1>
+
+
+<div class="subtitle">
+Enter the darkness. Find the evidence.
+</div>
+
+
+<button onclick="startInvestigation()">
+Start Investigation
+</button>
+
+
+</div>
+
+
+
+<footer>
+Experimental Ghost Hunting System
+</footer>
+
+
+
+<script>
+
+const audio = document.getElementById("backgroundNoise");
+
+audio.volume = 0.15;
+
+
+// Try autoplay
+audio.play();
+
+
+// Browser unlocks sound after first click
+document.addEventListener("click", function(){
+
+    audio.muted = false;
+    audio.play();
+
+}, { once: true });
+
+
+
+function startInvestigation(){
+
+    location.href = "investigation.html";
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
