@@ -1,58 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Thermometer</title>
+
+<style>
+
+body {
+
+    background:#050505;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    padding-top:25px;
+
+}
+
+
+
+h1 {
+
+    font-size:45px;
+    text-shadow:0 0 20px cyan;
+
+}
+
+
+
+#thermometer {
+
+    width:360px;
+    margin:auto;
+
+    background:#181818;
+
+    border:5px solid #555;
+
+    border-radius:35px;
+
+    padding:30px;
+
+    box-shadow:
+    0 0 35px black;
+
+}
+
+
+
+#screen {
+
+    background:#001522;
+
+    height:150px;
+
+    border-radius:20px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:65px;
+
+    color:#00ffff;
+
+    box-shadow:
+    0 0 30px cyan;
+
+    transition:0.5s;
+
+}
+
+
+
+#tube {
+
+    width:45px;
+
+    height:150px;
+
+    background:#333;
+
+    border-radius:30px;
+
+    margin:25px auto;
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+
+
+#liquid {
+
+    position:absolute;
+
+    bottom:0;
+
+    width:100%;
+
+    height:50%;
+
+    background:cyan;
+
+    transition:1s;
+
+}
+
+
+
+#status {
+
+    font-size:25px;
+
+    margin-top:20px;
+
+}
+
+
+
+#debug {
+
+    margin-top:25px;
+
+    color:#777;
+
+    font-size:18px;
+
+}
+
+
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+
+<h1>🌡️ Thermometer</h1>
+
+
+
+<div id="thermometer">
+
+
+<div id="screen">
+
+20.0°C
+
+</div>
+
+
+
+<div id="tube">
+
+<div id="liquid"></div>
+
+</div>
+
+
+
+<div id="status">
+
+Scanning...
+
+</div>
+
+
+<div id="debug">
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
 let ghost =
 JSON.parse(
 localStorage.getItem("currentGhost")
 );
 
 
+
 let temperature = 20;
 
 
 
-function calculateTargetTemperature(){
+
+
+
+
+function getTargetTemperature(){
+
 
 
 if(!ghost){
-    return 20;
+
+return 20;
+
 }
 
 
-// base temperature
+
+let distance =
+ghost.distance || 1.5;
+
+
 
 let target = 20;
 
 
 
-// closer = colder
+// closer ghost = colder
 
-if(ghost.distance <= 0.3){
 
-    target = 5;
+if(distance <= 0.3){
 
-}
-
-else if(ghost.distance <= 0.7){
-
-    target = 10;
+target = 6;
 
 }
 
-else if(ghost.distance <= 1.2){
+else if(distance <= 0.7){
 
-    target = 15;
+target = 10;
 
 }
+
+else if(distance <= 1.2){
+
+target = 15;
+
+}
+
+
 
 
 
 // freezing ghost
 
 if(
-ghost.evidence.includes("Freezing Temps")
+ghost.evidence.includes(
+"Freezing Temps"
+)
 &&
-ghost.distance <= 0.8
+distance <= 0.8
 ){
 
-    target = -5;
+target = -5;
 
 }
 
@@ -61,13 +271,19 @@ ghost.distance <= 0.8
 return target;
 
 
+
 }
 
 
 
 
 
-function updateTemperature(){
+
+
+
+
+function updateThermometer(){
+
 
 
 ghost =
@@ -78,24 +294,53 @@ localStorage.getItem("currentGhost")
 
 
 let target =
-calculateTargetTemperature();
+getTargetTemperature();
 
 
-// gradual change
+
+// gradual movement
 
 temperature +=
-(target-temperature)*0.05;
+(target - temperature) * 0.05;
 
 
 
-let display =
-temperature.toFixed(1);
+let screen =
+document.getElementById("screen");
 
 
 
-document.getElementById("screen")
-.innerHTML =
-display+"°C";
+screen.innerHTML =
+temperature.toFixed(1)
++
+"°C";
+
+
+
+
+
+
+// tube animation
+
+
+let height =
+Math.max(
+10,
+Math.min(
+100,
+temperature * 5
+)
+);
+
+
+
+document.getElementById("liquid")
+.style.height =
+height+"%";
+
+
+
+
 
 
 
@@ -103,13 +348,16 @@ display+"°C";
 if(temperature <= 0){
 
 
+screen.style.color="#66ccff";
+
+screen.style.boxShadow=
+"0 0 60px cyan";
+
+
 document.getElementById("status")
 .innerHTML =
 "❄ FREEZING TEMPERATURES";
 
-
-document.getElementById("screen")
-.style.color="cyan";
 
 
 }
@@ -117,14 +365,26 @@ document.getElementById("screen")
 else if(temperature < 10){
 
 
+
+screen.style.color="cyan";
+
+
 document.getElementById("status")
 .innerHTML =
-"Cold air detected";
+"🥶 Very cold air detected";
+
 
 
 }
 
 else{
+
+
+screen.style.color="white";
+
+
+screen.style.boxShadow=
+"0 0 30px cyan";
 
 
 document.getElementById("status")
@@ -136,14 +396,61 @@ document.getElementById("status")
 
 
 
-setTimeout(
-updateTemperature,
-1000
-);
+
+
+// testing information
+
+
+if(ghost){
+
+
+document.getElementById("debug")
+.innerHTML =
+
+"🧪 Testing Mode"
++
+"<br>Ghost: "
++
+ghost.name
++
+"<br>Distance: "
++
+ghost.distance
++
+"m"
++
+"<br>Evidence: "
++
+ghost.evidence.join(", ");
+
 
 
 }
 
 
 
-updateTemperature();
+
+setTimeout(
+updateThermometer,
+1000
+);
+
+
+
+}
+
+
+
+
+
+updateThermometer();
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
