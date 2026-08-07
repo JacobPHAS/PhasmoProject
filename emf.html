@@ -44,12 +44,20 @@ Phone direction: waiting...
 
 window.addEventListener("deviceorientation", function(event){
 
-    console.log(event);
-
     document.getElementById("direction").innerHTML =
     "Alpha: " + event.alpha +
     "<br>Beta: " + event.beta +
     "<br>Gamma: " + event.gamma;
+
+});
+
+
+window.addEventListener("deviceorientationabsolute", function(event){
+
+    document.getElementById("direction").innerHTML =
+    "Absolute Alpha: " + event.alpha;
+
+});
 
 });
 
