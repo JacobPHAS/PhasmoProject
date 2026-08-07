@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
 <title>EMF Reader</title>
 
 <style>
@@ -9,15 +10,74 @@
 body {
     background:black;
     color:white;
-    text-align:center;
     font-family:Arial;
-    margin-top:80px;
+    text-align:center;
+    margin:0;
+    padding-top:40px;
 }
 
-#emf {
-    font-size:50px;
-    margin:40px;
+
+h1 {
+    font-size:40px;
 }
+
+
+#device {
+
+    width:320px;
+    height:420px;
+    margin:auto;
+    background:#111;
+    border:5px solid #444;
+    border-radius:25px;
+    padding:20px;
+    box-shadow:0 0 30px black;
+
+}
+
+
+#screen {
+
+    background:#001900;
+    color:#00ff00;
+    height:160px;
+    border-radius:15px;
+    font-size:70px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:30px;
+
+}
+
+
+
+button {
+
+    font-size:22px;
+    padding:15px 25px;
+    border-radius:12px;
+    cursor:pointer;
+
+}
+
+
+#direction {
+
+    margin-top:20px;
+    font-size:18px;
+    color:#aaa;
+
+}
+
+
+#status {
+
+    font-size:25px;
+    margin-top:20px;
+
+}
+
 
 </style>
 
@@ -26,95 +86,91 @@ body {
 
 <body>
 
+
 <h1>📟 EMF Reader</h1>
+
+
+<div id="device">
+
+
+<div id="screen">
+EMF 0
+</div>
+
 
 <button onclick="enableSensors()">
 Enable Compass
 </button>
-  
-    <button onclick="startCompass()">
-Start Compass
-</button>
-<div id="emf">
-EMF 0
+
+
+<div id="status">
+Searching...
 </div>
 
-    <div id="direction">
-Phone direction: waiting...
+
 </div>
+
+
+<div id="direction">
+Waiting for sensor...
+</div>
+
+
 
 <script>
 
-function startCompass(){
 
-    window.addEventListener("deviceorientation", function(event){
-
-        document.getElementById("direction").innerHTML =
-        "Alpha: " + event.alpha;
-
-    });
-
-}
-    
-window.addEventListener("deviceorientation", function(event){
-
-    document.getElementById("direction").innerHTML =
-    "Alpha: " + event.alpha +
-    "<br>Beta: " + event.beta +
-    "<br>Gamma: " + event.gamma;
-
-});
-
-
-window.addEventListener("deviceorientationabsolute", function(event){
-
-    document.getElementById("direction").innerHTML =
-    "Absolute Alpha: " + event.alpha;
-
-});
-
-});
-
-});
-    
-function enableSensors(){
-
-    if(
-    typeof DeviceOrientationEvent !== "undefined" &&
-    typeof DeviceOrientationEvent.requestPermission === "function"
-    ){
-
-        DeviceOrientationEvent.requestPermission()
-        .then(response => {
-
-            if(response === "granted"){
-
-                alert("Compass enabled");
-
-            }
-
-        });
-
-    }
-
-}
-    
 let ghost = JSON.parse(
     localStorage.getItem("currentGhost")
 );
+
 
 
 let phoneDirection = 0;
 
 
 
-window.addEventListener("deviceorientation", function(event){
+// Read phone direction
 
-    phoneDirection = event.alpha;
+window.addEventListener(
+"deviceorientation",
+function(event){
+
+
+    if(event.alpha !== null){
+
+        phoneDirection = event.alpha;
+
+
+        document.getElementById("direction").innerHTML =
+        "Phone: " + Math.round(phoneDirection)
+        +
+        "<br>Ghost: " +
+        (ghost ? ghost.direction : "none");
+
+
+    }
+
 
 });
 
 
+
+
+// Android normally doesn't need this,
+// but keeps it compatible
+
+function enableSensors(){
+
+    document.getElementById("status").innerHTML =
+    "Sensors active";
+
+
+}
+
+
+
+// Check if looking at ghost
 
 function facingGhost(){
 
@@ -125,27 +181,30 @@ function facingGhost(){
 
 
     let difference =
-    Math.abs(phoneDirection - ghost.direction);
-
+    Math.abs(
+        phoneDirection -
+        ghost.direction
+    );
 
 
     if(difference > 180){
 
-        difference = 360 - difference;
+        difference =
+        360 - difference;
 
     }
 
 
+    return difference < 35;
 
-    return difference <= 30;
 
 }
 
 
 
 
+function getEMF(){
 
-function getEMFReading(){
 
 
     if(!facingGhost()){
@@ -156,39 +215,90 @@ function getEMFReading(){
 
 
 
-    if(ghost.evidence.includes("EMF Level 5")){
+    let hasEMF5 =
+    ghost.evidence.includes(
+        "EMF Level 5"
+    );
 
 
-        if(Math.random() < 0.10){
+
+    if(hasEMF5){
+
+
+        // 15% chance of EMF 5
+
+        if(Math.random() < 0.15){
 
             return 5;
 
         }
 
+
     }
 
 
 
-    return Math.floor(Math.random() * 4) + 1;
+    // Normal readings 1-4
+
+    return Math.floor(
+        Math.random()*4
+    ) + 1;
+
+
 
 }
 
 
 
 
-
-setInterval(function(){
-
-
-    let reading = getEMFReading();
+function updateEMF(){
 
 
-    document.getElementById("emf").innerHTML =
+    let reading =
+    getEMF();
+
+
+
+    document.getElementById("screen")
+    .innerHTML =
     "EMF " + reading;
 
 
 
-},1000);
+    if(reading === 5){
+
+        document.getElementById("status")
+        .innerHTML =
+        "⚠️ Strong Signal";
+
+    }
+
+    else if(reading > 0){
+
+        document.getElementById("status")
+        .innerHTML =
+        "Signal Detected";
+
+    }
+
+    else{
+
+        document.getElementById("status")
+        .innerHTML =
+        "Searching...";
+
+    }
+
+
+}
+
+
+
+
+setInterval(
+updateEMF,
+1000
+);
 
 
 
