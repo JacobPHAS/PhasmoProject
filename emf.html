@@ -28,6 +28,10 @@ body {
 
 <h1>📟 EMF Reader</h1>
 
+<button onclick="enableSensors()">
+Enable Compass
+</button>
+    
 <div id="emf">
 EMF 0
 </div>
@@ -35,6 +39,28 @@ EMF 0
 
 <script>
 
+function enableSensors(){
+
+    if(
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+    ){
+
+        DeviceOrientationEvent.requestPermission()
+        .then(response => {
+
+            if(response === "granted"){
+
+                alert("Compass enabled");
+
+            }
+
+        });
+
+    }
+
+}
+    
 let ghost = JSON.parse(
     localStorage.getItem("currentGhost")
 );
