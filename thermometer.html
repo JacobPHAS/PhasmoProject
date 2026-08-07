@@ -8,82 +8,106 @@
 <style>
 
 body {
+
     background:#050505;
     color:white;
-    font-family:Arial;
+    font-family:Arial,sans-serif;
     text-align:center;
+    overflow:hidden;
+
 }
 
 
 h1 {
-    font-size:42px;
+
+    font-size:45px;
     text-shadow:0 0 20px cyan;
+
 }
+
 
 
 #device {
 
     width:360px;
-    margin:auto;
-    background:#181818;
-    border:4px solid #555;
-    border-radius:30px;
-    padding:25px;
 
-    box-shadow:0 0 30px black;
+    margin:40px auto;
 
-}
+    background:#151515;
 
+    border:4px solid #444;
 
-
-#screen {
-
-    background:#001522;
-    color:#00ffff;
-
-    font-size:60px;
+    border-radius:35px;
 
     padding:30px;
 
+    box-shadow:0 0 40px black;
+
+}
+
+
+
+
+#temperature {
+
+    height:140px;
+
+    background:#001b25;
+
     border-radius:20px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:65px;
+
+    color:#00ffff;
 
     box-shadow:0 0 30px cyan;
 
+    transition:0.5s;
+
 }
 
 
 
-#compass {
 
-    margin:25px;
+#tube {
 
-    width:180px;
     height:180px;
 
-    border:5px solid white;
+    width:45px;
 
-    border-radius:50%;
+    background:#333;
 
-    margin-left:auto;
-    margin-right:auto;
+    border-radius:30px;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    margin:30px auto;
 
-    font-size:30px;
+    position:relative;
+
+    overflow:hidden;
 
 }
 
 
 
-button {
+#liquid {
 
-    padding:15px;
+    position:absolute;
 
-    font-size:20px;
+    bottom:0;
 
-    border-radius:15px;
+    width:100%;
+
+    height:50%;
+
+    background:#00ffff;
+
+    transition:1s;
 
 }
 
@@ -91,23 +115,106 @@ button {
 
 #status {
 
-    font-size:24px;
+    font-size:25px;
 
-    margin:20px;
+    margin-top:20px;
 
 }
 
 
+
+#miniCompass {
+
+
+    position:fixed;
+
+
+    right:20px;
+
+
+    bottom:20px;
+
+
+    width:130px;
+
+
+    height:130px;
+
+
+    border-radius:50%;
+
+
+    border:4px solid white;
+
+
+    background:#111;
+
+
+    box-shadow:0 0 25px cyan;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    cursor:grab;
+
+
+    user-select:none;
+
+
+    z-index:999;
+
+
+}
+
+
+
+#needle {
+
+
+    font-size:45px;
+
+    pointer-events:none;
+
+}
+
+
+
+#compassText {
+
+
+    position:absolute;
+
+
+    bottom:8px;
+
+
+    font-size:16px;
+
+}
+
+
+
 #debug {
+
+
+    margin-top:25px;
 
     color:#777;
 
 }
 
+
+
 </style>
 
 </head>
-
 
 
 <body>
@@ -120,23 +227,19 @@ button {
 <div id="device">
 
 
-<div id="compass">
-
-🧭
-<br>
-<span id="direction">
-0°
-</span>
-
-</div>
-
-
-
-<div id="screen">
+<div id="temperature">
 
 20.0°C
 
 </div>
+
+
+<div id="tube">
+
+<div id="liquid"></div>
+
+</div>
+
 
 
 <div id="status">
@@ -146,22 +249,34 @@ Scanning...
 </div>
 
 
+<div id="debug"></div>
 
-<button onclick="rotateCompass()">
 
-Rotate Compass
-
-</button>
+</div>
 
 
 
-<div id="debug">
+
+
+<div id="miniCompass">
+
+
+<div id="needle">
+
+🧭
 
 </div>
 
 
+<div id="compassText">
+
+0°
 
 </div>
+
+
+</div>
+
 
 
 
@@ -170,8 +285,7 @@ Rotate Compass
 <script>
 
 
-let ghost =
-JSON.parse(
+let ghost = JSON.parse(
 localStorage.getItem("currentGhost")
 );
 
@@ -184,50 +298,149 @@ let playerDirection = 0;
 
 
 
-// manual compass fallback
-
-function rotateCompass(){
-
-    playerDirection += 45;
 
 
-    if(playerDirection >= 360){
+// --------------------
+// DRAG COMPASS
+// --------------------
 
-        playerDirection = 0;
 
-    }
+let compass =
+document.getElementById("miniCompass");
+
+
+let dragging = false;
+
+
+
+compass.addEventListener(
+"pointerdown",
+()=>{
+
+dragging=true;
+
+});
+
+
+
+window.addEventListener(
+"pointerup",
+()=>{
+
+dragging=false;
+
+});
+
+
+
+
+
+window.addEventListener(
+"pointermove",
+(e)=>{
+
+
+if(!dragging)
+return;
+
+
+
+let rect =
+compass.getBoundingClientRect();
+
+
+
+let centerX =
+rect.left + rect.width/2;
+
+
+
+let centerY =
+rect.top + rect.height/2;
+
+
+
+let angle =
+Math.atan2(
+e.clientY-centerY,
+e.clientX-centerX
+)
+*
+180/Math.PI;
+
+
+
+playerDirection =
+Math.round(angle+90);
+
+
+
+if(playerDirection<0){
+
+playerDirection+=360;
 
 }
 
 
 
+document.getElementById(
+"compassText"
+)
+.innerHTML =
+playerDirection+"°";
 
 
-// check if facing ghost
+
+document.getElementById(
+"needle"
+)
+.style.transform =
+"rotate("
++
+playerDirection
++
+"deg)";
+
+
+});
+
+
+
+
+
+
+
+// --------------------
+// CHECK DIRECTION
+// --------------------
+
 
 function facingGhost(){
 
 
-    if(!ghost)
-    return false;
+if(!ghost)
+return false;
 
 
-    let difference =
-    Math.abs(
-        playerDirection -
-        ghost.direction
-    );
+
+let difference =
+Math.abs(
+playerDirection -
+ghost.direction
+);
 
 
-    if(difference > 180){
 
-        difference =
-        360-difference;
+if(difference>180){
 
-    }
+difference =
+360-difference;
+
+}
 
 
-    return difference < 45;
+
+return difference < 45;
 
 
 }
@@ -238,42 +451,45 @@ function facingGhost(){
 
 
 
-function targetTemperature(){
+// --------------------
+// TEMPERATURE LOGIC
+// --------------------
+
+
+function getTargetTemp(){
 
 
 
-    if(!ghost){
-
-        return 20;
-
-    }
+if(!facingGhost()){
 
 
+// cannot get colder than 15
+
+return 15;
 
 
-    if(!facingGhost()){
-
-        return 15;
-
-    }
+}
 
 
 
 
+if(
+ghost.evidence.includes(
+"Freezing Temps"
+)
 
-    if(
-    ghost.evidence.includes(
-        "Freezing Temps"
-    )
-    ){
-
-        return -5;
-
-    }
+){
 
 
+return -5;
 
-    return 10;
+
+}
+
+
+// normal ghost cold
+
+return 10;
 
 
 
@@ -285,7 +501,8 @@ function targetTemperature(){
 
 
 
-function update(){
+
+function updateThermometer(){
 
 
 
@@ -296,9 +513,9 @@ localStorage.getItem("currentGhost")
 
 
 
-
 let target =
-targetTemperature();
+getTargetTemp();
+
 
 
 
@@ -307,13 +524,12 @@ targetTemperature();
 let speed = 0.05;
 
 
+
 if(facingGhost()){
 
-    speed = 0.20;
+speed = 0.18;
 
 }
-
-
 
 
 
@@ -325,7 +541,9 @@ speed;
 
 
 
-document.getElementById("screen")
+document.getElementById(
+"temperature"
+)
 .innerHTML =
 temperature.toFixed(1)
 +
@@ -335,18 +553,35 @@ temperature.toFixed(1)
 
 
 
-document.getElementById("direction")
-.innerHTML =
-playerDirection+"°";
+let liquidHeight =
+Math.max(
+10,
+Math.min(
+100,
+temperature*5
+)
+);
+
+
+
+document.getElementById(
+"liquid"
+)
+.style.height =
+liquidHeight+"%";
 
 
 
 
 
-if(temperature <=0){
 
 
-document.getElementById("status")
+if(temperature<=0){
+
+
+document.getElementById(
+"status"
+)
 .innerHTML =
 "❄ FREEZING TEMPERATURES";
 
@@ -354,20 +589,25 @@ document.getElementById("status")
 }
 
 
-else if(temperature <15){
+else if(temperature<15){
 
 
-document.getElementById("status")
+document.getElementById(
+"status"
+)
 .innerHTML =
 "🥶 Cold air detected";
 
 
 }
 
+
 else{
 
 
-document.getElementById("status")
+document.getElementById(
+"status"
+)
 .innerHTML =
 "Scanning...";
 
@@ -379,10 +619,22 @@ document.getElementById("status")
 
 
 
-document.getElementById("debug")
+// testing
+
+
+if(ghost){
+
+
+document.getElementById(
+"debug"
+)
 .innerHTML =
 
 "🧪 Testing Mode"
++
+"<br>Ghost: "
++
+ghost.name
 +
 "<br>Ghost Direction: "
 +
@@ -402,20 +654,21 @@ facingGhost();
 
 
 
+}
+
 
 
 setTimeout(
-update,
+updateThermometer,
 1000
 );
-
 
 
 }
 
 
 
-update();
+updateThermometer();
 
 
 
