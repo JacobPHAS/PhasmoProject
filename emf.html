@@ -34,16 +34,23 @@ h1 {
 }
 
 
+
 #screen {
 
     height:150px;
+
     background:#001800;
+
     color:#00ff00;
+
     font-size:60px;
+
     font-weight:bold;
 
     display:flex;
+
     justify-content:center;
+
     align-items:center;
 
     border-radius:20px;
@@ -53,29 +60,49 @@ h1 {
 }
 
 
+
+
 #status {
 
     font-size:24px;
+
     margin-top:20px;
 
 }
 
 
+
+
+
+/* FLOATING COMPASS */
+
 #compass {
 
     width:230px;
+
     height:230px;
 
     border:5px solid white;
+
     border-radius:50%;
 
-    margin:30px auto;
+    position:fixed;
 
-    position:relative;
+    right:20px;
+
+    bottom:20px;
+
+    background:#111;
+
+    box-shadow:0 0 20px cyan;
 
     touch-action:none;
 
+    z-index:999;
+
 }
+
+
 
 
 #needle {
@@ -83,32 +110,50 @@ h1 {
     position:absolute;
 
     width:8px;
+
     height:100px;
 
     background:red;
 
     left:111px;
+
     top:15px;
 
     transform-origin:bottom;
 
     border-radius:10px;
 
+    box-shadow:0 0 15px red;
+
 }
+
 
 
 
 #direction {
 
+    position:fixed;
+
+    right:80px;
+
+    bottom:5px;
+
     color:#aaa;
+
     font-size:20px;
 
+    z-index:1000;
+
 }
+
 
 
 .hidden {
+
     display:none;
+
 }
+
 
 
 </style>
@@ -119,7 +164,9 @@ h1 {
 <body>
 
 
+
 <h1>📟 EMF Reader</h1>
+
 
 
 
@@ -127,30 +174,46 @@ h1 {
 
 
 <div id="screen">
+
 EMF 0
+
 </div>
+
 
 
 <div id="status">
+
 Starting...
+
 </div>
+
+
+
+</div>
+
+
+
 
 
 
 <div id="compass">
 
+
 <div id="needle"></div>
 
-</div>
-
 
 </div>
+
 
 
 
 <div id="direction">
+
 Direction: 0°
+
 </div>
+
+
 
 
 
@@ -176,6 +239,7 @@ let currentEMF = 0;
 
 
 
+
 const compass =
 document.getElementById("compass");
 
@@ -189,33 +253,37 @@ document.getElementById("needle");
 
 
 
-// REAL PHONE ROTATION
+// PHONE ROTATION
+
 
 window.addEventListener(
 "deviceorientation",
 function(event){
 
 
-    if(event.alpha !== null){
+if(event.alpha !== null){
 
 
-        realCompass = true;
+realCompass=true;
 
 
-        playerDirection =
-        event.alpha;
+playerDirection =
+event.alpha;
 
 
 
-        compass.classList.add("hidden");
+compass.classList.add("hidden");
 
 
-        document.getElementById("status")
-        .innerHTML =
-        "📱 Phone rotation mode";
+
+document.getElementById("status")
+.innerHTML =
+"📱 Phone rotation mode";
 
 
-    }
+
+}
+
 
 
 });
@@ -226,16 +294,19 @@ function(event){
 
 
 
-// MANUAL COMPASS
+
+
+// MANUAL DRAG COMPASS
 
 
 compass.addEventListener(
 "pointerdown",
 function(){
 
-dragging = true;
+dragging=true;
 
 });
+
 
 
 
@@ -246,6 +317,8 @@ function(){
 dragging=false;
 
 });
+
+
 
 
 
@@ -280,6 +353,7 @@ e.clientY -
 
 
 
+
 let angle =
 Math.atan2(y,x)
 *
@@ -295,17 +369,18 @@ angle + 90;
 
 if(playerDirection < 0){
 
-playerDirection += 360;
+playerDirection +=360;
 
 }
 
 
 
-if(playerDirection >= 360){
+if(playerDirection >=360){
 
-playerDirection -= 360;
+playerDirection -=360;
 
 }
+
 
 
 
@@ -319,6 +394,7 @@ playerDirection
 
 
 });
+
 
 
 
@@ -343,16 +419,16 @@ ghost.direction
 
 
 
-if(difference > 180){
+if(difference >180){
 
 difference =
-360 - difference;
+360-difference;
 
 }
 
 
 
-return difference < 35;
+return difference <35;
 
 
 }
@@ -378,20 +454,20 @@ return 0;
 
 
 
-
 if(
 ghost.evidence.includes(
-"EMF Level 5")
+"EMF Level 5"
+)
 ){
 
 
-if(
-Math.random() < 0.15
-){
+
+if(Math.random()<0.15){
 
 return 5;
 
 }
+
 
 
 }
@@ -419,7 +495,7 @@ function makeBeep(level){
 
 
 
-if(level <= 0)
+if(level<=0)
 return;
 
 
@@ -445,7 +521,7 @@ oscillator.type =
 
 
 oscillator.frequency.value =
-250 + (level * 180);
+250+(level*180);
 
 
 
@@ -466,13 +542,12 @@ oscillator.start();
 
 
 oscillator.stop(
-audio.currentTime + 0.12
+audio.currentTime+0.12
 );
 
 
 
 }
-
 
 
 
@@ -493,13 +568,17 @@ localStorage.getItem("currentGhost")
 
 
 
+
 currentEMF =
 getEMF();
 
 
 
+
+
 let screen =
 document.getElementById("screen");
+
 
 
 
@@ -511,63 +590,87 @@ currentEMF;
 
 
 
+
+
 screen.style.background =
 "#001800";
 
 
 
-if(currentEMF === 0){
+
+
+if(currentEMF===0){
 
 screen.style.color="#00ff00";
-screen.style.boxShadow="0 0 15px green";
+
+screen.style.boxShadow=
+"0 0 15px green";
 
 }
 
 
-if(currentEMF === 1){
+
+if(currentEMF===1){
 
 screen.style.color="lime";
-screen.style.boxShadow="0 0 25px lime";
+
+screen.style.boxShadow=
+"0 0 25px lime";
 
 }
 
 
-if(currentEMF === 2){
+
+if(currentEMF===2){
 
 screen.style.color="yellow";
-screen.style.boxShadow="0 0 35px yellow";
+
+screen.style.boxShadow=
+"0 0 35px yellow";
 
 }
 
 
-if(currentEMF === 3){
+
+if(currentEMF===3){
 
 screen.style.color="orange";
-screen.style.boxShadow="0 0 45px orange";
+
+screen.style.boxShadow=
+"0 0 45px orange";
 
 }
 
 
-if(currentEMF === 4){
+
+if(currentEMF===4){
 
 screen.style.color="red";
-screen.style.boxShadow="0 0 60px red";
+
+screen.style.boxShadow=
+"0 0 60px red";
 
 }
 
 
-if(currentEMF === 5){
+
+if(currentEMF===5){
 
 screen.style.color="white";
+
 screen.style.background="darkred";
-screen.style.boxShadow="0 0 90px red";
+
+screen.style.boxShadow=
+"0 0 90px red";
 
 }
 
 
 
 
-if(currentEMF > 0){
+
+if(currentEMF>0){
+
 
 document.getElementById("status")
 .innerHTML =
@@ -575,6 +678,7 @@ document.getElementById("status")
 
 
 makeBeep(currentEMF);
+
 
 
 }
@@ -592,6 +696,8 @@ document.getElementById("status")
 
 
 
+
+
 document.getElementById("direction")
 .innerHTML =
 "Direction: "
@@ -602,8 +708,11 @@ Math.round(playerDirection)
 
 
 
+
+
+
 let delay =
-Math.random()*1200 + 700;
+Math.random()*1200+700;
 
 
 
@@ -613,8 +722,8 @@ delay
 );
 
 
-}
 
+}
 
 
 
