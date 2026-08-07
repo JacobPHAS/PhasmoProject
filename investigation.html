@@ -326,35 +326,31 @@ showGhost();
 function showGhost(){
 
 
-document.getElementById("debugGhost")
-.innerHTML =
-
+document.getElementById("debugGhost").innerHTML =
 
 "🧪 Testing Mode"
 +
 "<br><br>"
-
 +
-
 "Ghost: "
 +
 ghost.name
-
 +
-
 "<br>Evidence: "
 +
 ghost.evidence.join(", ")
-
 +
-
 "<br>Direction: "
 +
-Math.round(
-ghost.direction
-)
+Math.round(ghost.direction)
 +
-"°";
+"°"
++
+"<br>Distance: "
++
+ghost.distance
++
+"m";
 
 
 
