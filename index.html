@@ -124,27 +124,25 @@ document.addEventListener("click", function(){
 
 function startInvestigation(){
 
-    let chosenGhost =
-        ghosts[Math.floor(Math.random() * ghosts.length)];
+let chosenGhost =
+ghosts[Math.floor(Math.random() * ghosts.length)];
+
+chosenGhost.direction = Math.floor(Math.random() * 360);
+
+distance: Number(
+(Math.random() * 1.4 + 0.1).toFixed(1)
 
 
-    chosenGhost.direction =
-        Math.floor(Math.random() * 360);
+)
+localStorage.setItem(
+"currentGhost",
+JSON.stringify(chosenGhost)
+);
+
+location.href = "investigation.html";
 
 
-    chosenGhost.distance =
-        Number(
-            (Math.random() * 1.4 + 0.1).toFixed(1)
-        );
-
-
-    localStorage.setItem(
-        "currentGhost",
-        JSON.stringify(chosenGhost)
-    );
-
-
-    location.href = "investigation.html";
+}
 
 }
 
