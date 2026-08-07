@@ -8,21 +8,16 @@
 <style>
 
 body {
-
     background:#050505;
     color:white;
     font-family:Arial,sans-serif;
     text-align:center;
-    overflow:hidden;
-
 }
 
 
 h1 {
-
     font-size:45px;
     text-shadow:0 0 20px cyan;
-
 }
 
 
@@ -30,18 +25,16 @@ h1 {
 #device {
 
     width:360px;
-
     margin:40px auto;
+    padding:30px;
 
     background:#151515;
 
     border:4px solid #444;
 
-    border-radius:35px;
+    border-radius:30px;
 
-    padding:30px;
-
-    box-shadow:0 0 40px black;
+    box-shadow:0 0 30px black;
 
 }
 
@@ -50,25 +43,17 @@ h1 {
 
 #temperature {
 
-    height:140px;
+    background:#001820;
 
-    background:#001b25;
+    padding:30px;
 
     border-radius:20px;
 
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:65px;
+    font-size:60px;
 
     color:#00ffff;
 
-    box-shadow:0 0 30px cyan;
-
-    transition:0.5s;
+    box-shadow:0 0 25px cyan;
 
 }
 
@@ -77,19 +62,19 @@ h1 {
 
 #tube {
 
-    height:180px;
-
     width:45px;
 
-    background:#333;
-
-    border-radius:30px;
+    height:180px;
 
     margin:30px auto;
 
-    position:relative;
+    background:#222;
+
+    border-radius:30px;
 
     overflow:hidden;
+
+    position:relative;
 
 }
 
@@ -105,11 +90,13 @@ h1 {
 
     height:50%;
 
-    background:#00ffff;
+    background:red;
 
     transition:1s;
 
 }
+
+
 
 
 
@@ -123,93 +110,110 @@ h1 {
 
 
 
-#miniCompass {
 
+
+/* FLOATING COMPASS */
+
+#miniCompass {
 
     position:fixed;
 
-
     right:20px;
-
 
     bottom:20px;
 
-
-    width:130px;
-
-
-    height:130px;
-
-
-    border-radius:50%;
-
-
-    border:4px solid white;
-
-
-    background:#111;
-
-
-    box-shadow:0 0 25px cyan;
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    justify-content:center;
-
-
-    cursor:grab;
-
-
-    user-select:none;
-
+    width:150px;
 
     z-index:999;
 
+}
+
+
+
+
+#compassCircle {
+
+    width:130px;
+
+    height:130px;
+
+    border-radius:50%;
+
+    border:4px solid white;
+
+    background:#111;
+
+    position:relative;
+
+    cursor:grab;
+
+    box-shadow:0 0 25px cyan;
 
 }
 
 
 
-#needle {
 
 
-    font-size:45px;
+#redNeedle {
 
-    pointer-events:none;
+    position:absolute;
+
+    width:4px;
+
+    height:55px;
+
+    background:red;
+
+    left:63px;
+
+    top:10px;
+
+    transform-origin:bottom center;
+
+    box-shadow:0 0 15px red;
 
 }
+
+
+
+
+
+#north {
+
+    position:absolute;
+
+    top:5px;
+
+    left:60px;
+
+    font-weight:bold;
+
+}
+
+
 
 
 
 #compassText {
 
+    margin-top:8px;
 
-    position:absolute;
-
-
-    bottom:8px;
-
-
-    font-size:16px;
+    font-size:18px;
 
 }
+
+
 
 
 
 #debug {
 
-
-    margin-top:25px;
+    margin-top:20px;
 
     color:#777;
 
 }
-
 
 
 </style>
@@ -217,7 +221,9 @@ h1 {
 </head>
 
 
+
 <body>
+
 
 
 <h1>🌡️ Thermometer</h1>
@@ -227,11 +233,12 @@ h1 {
 <div id="device">
 
 
+
 <div id="temperature">
-
 20.0°C
-
 </div>
+
+
 
 
 <div id="tube">
@@ -242,14 +249,16 @@ h1 {
 
 
 
+
 <div id="status">
-
 Scanning...
-
 </div>
 
 
+
+
 <div id="debug"></div>
+
 
 
 </div>
@@ -261,21 +270,29 @@ Scanning...
 <div id="miniCompass">
 
 
-<div id="needle">
+<div id="compassCircle">
 
-🧭
+
+<div id="redNeedle"></div>
+
+
+<div id="north">
+N
+</div>
+
 
 </div>
+
 
 
 <div id="compassText">
-
 0°
-
 </div>
 
 
 </div>
+
+
 
 
 
@@ -285,7 +302,9 @@ Scanning...
 <script>
 
 
-let ghost = JSON.parse(
+
+let ghost =
+JSON.parse(
 localStorage.getItem("currentGhost")
 );
 
@@ -300,16 +319,17 @@ let playerDirection = 0;
 
 
 
-// --------------------
-// DRAG COMPASS
-// --------------------
+// COMPASS DRAGGING
 
 
 let compass =
-document.getElementById("miniCompass");
+document.getElementById(
+"compassCircle"
+);
 
 
-let dragging = false;
+
+let dragging=false;
 
 
 
@@ -334,7 +354,6 @@ dragging=false;
 
 
 
-
 window.addEventListener(
 "pointermove",
 (e)=>{
@@ -350,21 +369,20 @@ compass.getBoundingClientRect();
 
 
 
-let centerX =
-rect.left + rect.width/2;
+let x =
+e.clientX -
+(rect.left + rect.width/2);
 
 
 
-let centerY =
-rect.top + rect.height/2;
+let y =
+e.clientY -
+(rect.top + rect.height/2);
 
 
 
 let angle =
-Math.atan2(
-e.clientY-centerY,
-e.clientX-centerX
-)
+Math.atan2(y,x)
 *
 180/Math.PI;
 
@@ -384,15 +402,7 @@ playerDirection+=360;
 
 
 document.getElementById(
-"compassText"
-)
-.innerHTML =
-playerDirection+"°";
-
-
-
-document.getElementById(
-"needle"
+"redNeedle"
 )
 .style.transform =
 "rotate("
@@ -402,17 +412,21 @@ playerDirection
 "deg)";
 
 
+
+document.getElementById(
+"compassText"
+)
+.innerHTML =
+playerDirection+"°";
+
+
+
 });
 
 
 
 
 
-
-
-// --------------------
-// CHECK DIRECTION
-// --------------------
 
 
 function facingGhost(){
@@ -440,7 +454,7 @@ difference =
 
 
 
-return difference < 45;
+return difference <45;
 
 
 }
@@ -451,43 +465,37 @@ return difference < 45;
 
 
 
-// --------------------
-// TEMPERATURE LOGIC
-// --------------------
+function getTargetTemperature(){
 
 
-function getTargetTemp(){
 
-
+// Not facing ghost
 
 if(!facingGhost()){
 
-
-// cannot get colder than 15
-
-return 15;
-
+    return 15;
 
 }
 
 
 
+
+// Freezing evidence
 
 if(
 ghost.evidence.includes(
 "Freezing Temps"
 )
-
 ){
 
-
-return -5;
-
+    return -5;
 
 }
 
 
-// normal ghost cold
+
+
+// Normal ghost
 
 return 10;
 
@@ -514,12 +522,11 @@ localStorage.getItem("currentGhost")
 
 
 let target =
-getTargetTemp();
+getTargetTemperature();
 
 
 
 
-// faster when facing ghost
 
 let speed = 0.05;
 
@@ -527,9 +534,11 @@ let speed = 0.05;
 
 if(facingGhost()){
 
-speed = 0.18;
+    speed = 0.2;
 
 }
+
+
 
 
 
@@ -537,6 +546,9 @@ temperature +=
 (target-temperature)
 *
 speed;
+
+
+
 
 
 
@@ -553,9 +565,10 @@ temperature.toFixed(1)
 
 
 
+
 let liquidHeight =
 Math.max(
-10,
+5,
 Math.min(
 100,
 temperature*5
@@ -576,6 +589,7 @@ liquidHeight+"%";
 
 
 
+
 if(temperature<=0){
 
 
@@ -587,20 +601,6 @@ document.getElementById(
 
 
 }
-
-
-else if(temperature<15){
-
-
-document.getElementById(
-"status"
-)
-.innerHTML =
-"🥶 Cold air detected";
-
-
-}
-
 
 else{
 
@@ -619,7 +619,6 @@ document.getElementById(
 
 
 
-// testing
 
 
 if(ghost){
@@ -653,8 +652,10 @@ playerDirection
 facingGhost();
 
 
-
 }
+
+
+
 
 
 
@@ -668,11 +669,14 @@ updateThermometer,
 
 
 
+
+
 updateThermometer();
 
 
 
 </script>
+
 
 
 </body>
