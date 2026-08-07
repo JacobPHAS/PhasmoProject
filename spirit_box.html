@@ -3,35 +3,167 @@
 
 <head>
 
-<meta charset="UTF-8">
-
 <title>Spirit Box</title>
 
 <style>
 
 body {
-    background: black;
-    color: white;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    margin-top: 80px;
+
+    background:#050505;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    padding-top:20px;
+
 }
+
+
 
 h1 {
-    font-size: 40px;
+
+    font-size:42px;
+
 }
+
+
+
+#device {
+
+    width:360px;
+
+    margin:auto;
+
+    background:#111;
+
+    border:6px solid #444;
+
+    border-radius:35px;
+
+    padding:25px;
+
+    box-shadow:
+    0 0 40px black;
+
+}
+
+
+
+#screen {
+
+    height:140px;
+
+    background:#001900;
+
+    border-radius:20px;
+
+    color:#00ff00;
+
+    font-size:30px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    box-shadow:
+    0 0 25px #00ff00;
+
+    transition:0.3s;
+
+}
+
+
+
+#frequency {
+
+    margin-top:15px;
+
+    font-size:28px;
+
+    color:#aaa;
+
+}
+
+
+
+#bars {
+
+    margin:20px;
+
+    font-size:30px;
+
+    letter-spacing:5px;
+
+    color:#00ff00;
+
+}
+
+
 
 button {
-    font-size: 24px;
-    padding: 15px 35px;
-    border-radius: 10px;
-    cursor: pointer;
+
+    font-size:22px;
+
+    padding:15px 25px;
+
+    border-radius:15px;
+
+    margin:10px;
+
+    cursor:pointer;
+
 }
 
-#status, #heard, #reply {
-    margin: 25px;
-    font-size: 25px;
+
+
+#heard {
+
+    margin-top:20px;
+
+    color:#aaa;
+
 }
+
+
+
+#reply {
+
+    margin-top:20px;
+
+    font-size:26px;
+
+}
+
+
+
+.scan {
+
+animation:scan 0.5s infinite alternate;
+
+}
+
+
+@keyframes scan {
+
+
+from {
+
+opacity:0.5;
+
+}
+
+
+to {
+
+opacity:1;
+
+}
+
+
+}
+
+
 
 </style>
 
@@ -41,32 +173,63 @@ button {
 <body>
 
 
-<h1>🎤 Spirit Box</h1>
 
-
-<audio id="staticNoise" loop>
-    <source src="static.mp3" type="audio/mpeg">
-</audio>
+<h1>🎤 SPIRIT BOX</h1>
 
 
 
-<button id="button" onclick="toggleSpiritBox()">
-Turn On
+<div id="device">
+
+
+<div id="screen">
+
+OFF
+
+</div>
+
+
+
+<div id="frequency">
+
+102.4 MHz
+
+</div>
+
+
+
+<div id="bars">
+
+▮▮▯▯▯
+
+</div>
+
+
+
+<button onclick="toggleBox()">
+
+POWER
+
 </button>
 
 
 
-<div id="status">
-Status: Off
-</div>
-
-
 <div id="heard">
-Heard: Waiting...
+
+Heard: -
+
 </div>
 
 
-<div id="reply"></div>
+
+<div id="reply">
+
+Response: -
+
+</div>
+
+
+
+</div>
 
 
 
@@ -75,48 +238,74 @@ Heard: Waiting...
 <script>
 
 
-const responses = {
+let ghost =
+JSON.parse(
+localStorage.getItem("currentGhost")
+);
 
 
-"are you here": [
-    "Yes.",
-    "I am here.",
-    "Hello.",
-    "I hear you."
+
+let spiritOn=false;
+
+let recognition;
+
+
+
+
+
+const questions = {
+
+
+"are you here":[
+
+"Yes",
+
+"I am here",
+
+"You found me"
+
 ],
 
 
-"where are you": [
-    "Nearby.",
-    "Close.",
-    "Behind you."
+"where are you":[
+
+"Nearby",
+
+"Close",
+
+"Behind you"
+
 ],
 
 
-"how old are you": [
-    "I don't remember.",
-    "Very old.",
-    "A long time ago."
+"how old are you":[
+
+"I don't remember",
+
+"Very old",
+
+"Long ago"
+
 ],
 
 
-"can you talk to us": [
-    "Yes.",
-    "I can hear you."
+"give us a sign":[
+
+"Look",
+
+"Listen",
+
+"Now"
+
 ],
 
 
-"give us a sign": [
-    "Look.",
-    "Listen.",
-    "Soon."
-],
+"can you talk":[
 
+"Yes",
 
-"do you want to hurt us": [
-    "No.",
-    "Never.",
-    "I mean no harm."
+"I can hear you"
+
 ]
 
 
@@ -124,84 +313,230 @@ const responses = {
 
 
 
-let spiritBoxOn = false;
-let spiritActive = false;
 
 
-const button = document.getElementById("button");
-const noise = document.getElementById("staticNoise");
+function toggleBox(){
 
 
 
-
-
-function toggleSpiritBox(){
-
-
-    if(!spiritBoxOn){
-
-
-        spiritBoxOn = true;
-
-        button.innerHTML = "Turn Off";
-
-
-        noise.volume = 0.15;
-
-        noise.play();
+let screen =
+document.getElementById("screen");
 
 
 
-        let ghost = JSON.parse(
-            localStorage.getItem("currentGhost")
-        );
+if(spiritOn){
+
+
+spiritOn=false;
+
+
+screen.innerHTML="OFF";
+
+
+screen.classList.remove("scan");
 
 
 
-        if(ghost){
+if(recognition){
 
-            spiritActive =
-            ghost.evidence.includes("Spirit Box");
+recognition.stop();
 
-        }
-
-        else{
-
-            spiritActive = false;
-
-        }
+}
 
 
 
-        document.getElementById("status").innerHTML =
-        "Status: Active";
+return;
+
+
+}
 
 
 
-        listen();
 
-
-    }
+spiritOn=true;
 
 
 
-    else{
+screen.innerHTML="SCANNING";
+
+screen.classList.add("scan");
 
 
-        spiritBoxOn = false;
+
+startListening();
 
 
-        button.innerHTML = "Turn On";
+}
 
 
-        noise.pause();
 
 
-        document.getElementById("status").innerHTML =
-        "Status: Off";
+
+function startListening(){
 
 
-    }
+
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+
+
+if(!SpeechRecognition){
+
+alert(
+"Speech recognition not supported"
+);
+
+return;
+
+}
+
+
+
+recognition =
+new SpeechRecognition();
+
+
+
+recognition.lang="en-GB";
+
+
+recognition.continuous=true;
+
+
+recognition.interimResults=false;
+
+
+
+
+
+recognition.onresult=function(event){
+
+
+
+let text =
+event.results
+[event.results.length-1]
+[0]
+.transcript
+.toLowerCase();
+
+
+
+document.getElementById("heard")
+.innerHTML=
+"Heard: "
++
+text;
+
+
+
+checkQuestion(text);
+
+
+
+};
+
+
+
+
+
+recognition.onerror=function(){
+
+
+if(spiritOn){
+
+setTimeout(()=>{
+
+recognition.start();
+
+},500);
+
+
+}
+
+
+
+};
+
+
+
+recognition.start();
+
+
+
+}
+
+
+
+
+
+
+
+function checkQuestion(text){
+
+
+
+if(!ghost)
+return;
+
+
+
+if(
+!ghost.evidence.includes(
+"Spirit Box")
+){
+
+return;
+
+}
+
+
+
+
+for(let q in questions){
+
+
+
+if(text.includes(q)){
+
+
+
+if(Math.random()<0.4){
+
+
+
+let answer =
+questions[q]
+[
+Math.floor(
+Math.random()
+*
+questions[q].length
+)
+];
+
+
+
+reply(answer);
+
+
+
+}
+
+
+
+break;
+
+
+
+}
+
+
+
+}
+
 
 
 }
@@ -213,144 +548,70 @@ function toggleSpiritBox(){
 
 
 
-function listen(){
+function reply(text){
 
 
-    if(!spiritBoxOn){
 
-        return;
+let screen =
+document.getElementById("screen");
 
-    }
 
 
+screen.innerHTML =
+text;
 
 
-    const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
 
+screen.style.color="red";
 
 
-    if(!SpeechRecognition){
+screen.style.boxShadow=
+"0 0 50px red";
 
-        alert("Speech recognition is not supported");
 
-        return;
 
-    }
+document.getElementById("reply")
+.innerHTML=
+"Response: "
++
+text;
 
 
 
-    let recognition =
-    new SpeechRecognition();
 
+let voice =
+new SpeechSynthesisUtterance(text);
 
 
-    recognition.lang = "en-GB";
 
-    recognition.continuous = false;
+voice.pitch=0.3;
 
-    recognition.interimResults = false;
+voice.rate=0.65;
 
 
+speechSynthesis.speak(
+voice
+);
 
 
-    document.getElementById("heard").innerHTML =
-    "Listening...";
 
 
 
-    recognition.start();
+setTimeout(()=>{
 
 
+screen.innerHTML="SCANNING";
 
 
+screen.style.color="#00ff00";
 
-    recognition.onresult = function(event){
 
+screen.style.boxShadow=
+"0 0 25px #00ff00";
 
 
-        let text =
-        event.results[0][0]
-        .transcript
-        .toLowerCase();
+},3000);
 
-
-
-        document.getElementById("heard").innerHTML =
-        "Heard: " + text;
-
-
-
-        document.getElementById("reply").innerHTML = "";
-
-
-
-
-        if(spiritActive){
-
-
-
-            for(let question in responses){
-
-
-
-                if(text.includes(question)){
-
-
-
-                    // 1 in 3 chance to answer
-                    if(Math.random() <= 1/3){
-
-
-
-                        let answer =
-                        responses[question]
-                        [
-                        Math.floor(
-                        Math.random() *
-                        responses[question].length
-                        )
-                        ];
-
-
-
-                        sayReply(answer);
-
-
-                    }
-
-
-                    break;
-
-
-                }
-
-
-            }
-
-
-        }
-
-
-
-
-        restartListening();
-
-
-    };
-
-
-
-
-
-    recognition.onerror = function(){
-
-
-        restartListening();
-
-
-    };
 
 
 }
@@ -360,54 +621,45 @@ function listen(){
 
 
 
-function restartListening(){
+// fake frequency movement
+
+setInterval(()=>{
 
 
-    setTimeout(()=>{
-
-
-        if(spiritBoxOn){
-
-            listen();
-
-        }
-
-
-    },500);
-
-
-}
+if(!spiritOn)
+return;
 
 
 
+let freq =
+(100+Math.random()*10)
+.toFixed(1);
 
 
 
-
-function sayReply(answer){
-
-
-    document.getElementById("reply").innerHTML =
-    "Response: " + answer;
+document.getElementById("frequency")
+.innerHTML =
+freq+" MHz";
 
 
 
-    let voice =
-    new SpeechSynthesisUtterance(answer);
+let strength =
+Math.floor(
+Math.random()*5
+)+1;
 
 
 
-voice.rate = 0.7;
-voice.pitch = 0.4;
-voice.volume = 1;
+document.getElementById("bars")
+.innerHTML =
+"▮".repeat(strength)
++
+"▯".repeat(5-strength);
 
 
 
-    speechSynthesis.speak(voice);
+},500);
 
-
-
-}
 
 
 
