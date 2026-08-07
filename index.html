@@ -127,6 +127,7 @@ function startInvestigation(){
     let chosenGhost =
     ghosts[Math.floor(Math.random() * ghosts.length)];
 
+    chosenGhost.direction = Math.floor(Math.random() * 360);
 
     localStorage.setItem(
         "currentGhost",
