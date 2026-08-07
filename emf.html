@@ -36,9 +36,21 @@ Enable Compass
 EMF 0
 </div>
 
+    <div id="direction">
+Phone direction: waiting...
+</div>
 
 <script>
 
+window.addEventListener("deviceorientation", function(event){
+
+    let phoneDirection = event.alpha;
+
+    document.getElementById("direction").innerHTML =
+    "Phone direction: " + Math.round(phoneDirection);
+
+});
+    
 function enableSensors(){
 
     if(
