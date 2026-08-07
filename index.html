@@ -3,7 +3,7 @@
 
 <head>
 
-<title>Ghost Hunter</title>
+<title>Ghost Investigation</title>
 
 <style>
 
@@ -11,9 +11,9 @@ body {
 
     background:#050505;
     color:white;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
     text-align:center;
-    padding-top:40px;
+    padding-top:60px;
 
 }
 
@@ -21,16 +21,7 @@ body {
 h1 {
 
     font-size:50px;
-    text-shadow:0 0 25px white;
-
-}
-
-
-
-p {
-
-    color:#aaa;
-    font-size:22px;
+    text-shadow:0 0 25px cyan;
 
 }
 
@@ -38,21 +29,23 @@ p {
 
 button {
 
+    margin-top:40px;
+
+    padding:20px 50px;
+
+    font-size:25px;
+
+    border-radius:20px;
+
+    border:2px solid cyan;
+
     background:#111;
 
     color:white;
 
-    border:2px solid #555;
-
-    border-radius:20px;
-
-    padding:20px 40px;
-
-    font-size:25px;
-
     cursor:pointer;
 
-    margin-top:30px;
+    box-shadow:0 0 20px cyan;
 
 }
 
@@ -60,21 +53,19 @@ button {
 
 button:hover {
 
-    background:#333;
-
-    box-shadow:0 0 25px white;
+    background:#222;
 
 }
 
 
 
-#ghostInfo {
+#status {
 
-    margin:30px auto;
+    margin-top:30px;
 
-    color:#777;
+    color:#aaa;
 
-    font-size:18px;
+    font-size:20px;
 
 }
 
@@ -85,21 +76,15 @@ button:hover {
 </head>
 
 
-
 <body>
-
 
 
 <h1>👻 Ghost Hunter</h1>
 
 
 <p>
-
-Enter the investigation
-
+Ready to begin investigation?
 </p>
-
-
 
 
 <button onclick="startInvestigation()">
@@ -110,9 +95,7 @@ Start Investigation
 
 
 
-<div id="ghostInfo">
-
-</div>
+<div id="status"></div>
 
 
 
@@ -121,156 +104,102 @@ Start Investigation
 <script>
 
 
-
-const ghosts = [
-
-
-{
-
-name:"Wraith",
-
-evidence:[
-"EMF Level 5",
-"Spirit Box",
-"DOTS"
-]
-
-},
-
-
-
-{
-
-name:"Phantom",
-
-evidence:[
-"Spirit Box",
-"UV",
-"DOTS"
-]
-
-},
-
-
-
-{
-
-name:"Banshee",
-
-evidence:[
-"EMF Level 5",
-"DOTS",
-"UV"
-]
-
-},
-
-
-
-{
-
-name:"Shade",
-
-evidence:[
-"EMF Level 5",
-"Ghost Writing",
-"Freezing Temps"
-]
-
-},
-
-
-
-{
-
-name:"Demon",
-
-evidence:[
-"Freezing Temps",
-"Ghost Writing",
-"UV"
-]
-
-}
-
-
-
-];
-
-
-
-
-
-
-
-
 function startInvestigation(){
 
 
+    // Check ghosts exists
 
-let chosenGhost =
-ghosts[
-Math.floor(
-Math.random()*ghosts.length
-)
-];
+    if(typeof ghosts === "undefined"){
 
+        alert(
+        "Ghost list not loaded!"
+        );
 
+        return;
 
-
-
-let currentGhost = {
-
-
-name:
-chosenGhost.name,
-
-
-evidence:
-chosenGhost.evidence,
+    }
 
 
 
-direction:
-Math.floor(
-Math.random()*360
-),
+
+    // Pick random ghost
+
+    let chosenGhost =
+    ghosts[
+        Math.floor(
+            Math.random()*ghosts.length
+        )
+    ];
 
 
 
 
 
+    // Create investigation ghost
+
+    let currentGhost = {
+
+
+        name:
+        chosenGhost.name,
+
+
+        evidence:
+        chosenGhost.evidence,
+
+
+
+        direction:
+        Math.floor(
+            Math.random()*360
+        )
+
+
+
+    };
 
 
 
 
 
-localStorage.setItem(
 
-"currentGhost",
+    // Save ghost
 
-JSON.stringify(currentGhost)
-
-);
-
-
+    localStorage.setItem(
+        "currentGhost",
+        JSON.stringify(currentGhost)
+    );
 
 
 
-location.href =
-"investigation.html";
+
+
+    document.getElementById(
+        "status"
+    )
+    .innerHTML =
+    "👻 Ghost selected...";
+
+
+
+
+
+    setTimeout(()=>{
+
+
+        window.location.href =
+        "investigation.html";
+
+
+    },1000);
 
 
 
 }
-
-
 
 
 
 </script>
-
-
 
 
 </body>
