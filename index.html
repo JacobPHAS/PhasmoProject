@@ -11,7 +11,7 @@ body {
 
     background:#050505;
     color:white;
-    font-family:Arial,sans-serif;
+    font-family:Arial, sans-serif;
     text-align:center;
     padding-top:60px;
 
@@ -24,7 +24,6 @@ h1 {
     text-shadow:0 0 25px cyan;
 
 }
-
 
 
 button {
@@ -50,13 +49,11 @@ button {
 }
 
 
-
 button:hover {
 
     background:#222;
 
 }
-
 
 
 #status {
@@ -69,11 +66,10 @@ button:hover {
 
 }
 
-
-
 </style>
 
 </head>
+
 
 
 <body>
@@ -81,18 +77,14 @@ button:hover {
 
 <h1>👻 Ghost Hunter</h1>
 
-
 <p>
-Ready to begin investigation?
+Start a new investigation
 </p>
 
 
-<button onclick="startInvestigation()">
-
+<button id="startBtn">
 Start Investigation
-
 </button>
-
 
 
 <div id="status"></div>
@@ -101,20 +93,39 @@ Start Investigation
 
 
 
+<!-- YOUR GHOST FILE MUST BE HERE -->
+<script src="ghosts.js"></script>
+
+
+
 <script>
 
-    src="ghosts.js">
 
-function startInvestigation(){
+window.onload = function(){
 
 
-    // Check ghosts exists
+
+const button =
+document.getElementById("startBtn");
+
+
+
+button.onclick = function(){
+
+
 
     if(typeof ghosts === "undefined"){
 
-        alert(
-        "Ghost list not loaded!"
+
+        document.getElementById("status")
+        .innerHTML =
+        "❌ Ghost list not loaded";
+
+
+        console.log(
+        "ghosts.js is missing or loaded after this file"
         );
+
 
         return;
 
@@ -123,12 +134,12 @@ function startInvestigation(){
 
 
 
-    // Pick random ghost
+
 
     let chosenGhost =
     ghosts[
         Math.floor(
-            Math.random()*ghosts.length
+            Math.random() * ghosts.length
         )
     ];
 
@@ -136,7 +147,6 @@ function startInvestigation(){
 
 
 
-    // Create investigation ghost
 
     let currentGhost = {
 
@@ -149,12 +159,17 @@ function startInvestigation(){
         chosenGhost.evidence,
 
 
-
         direction:
         Math.floor(
             Math.random()*360
-        )
+        ),
 
+
+        distance:
+        Number(
+            (Math.random()*1.4+0.1)
+            .toFixed(1)
+        )
 
 
     };
@@ -163,8 +178,6 @@ function startInvestigation(){
 
 
 
-
-    // Save ghost
 
     localStorage.setItem(
         "currentGhost",
@@ -175,32 +188,37 @@ function startInvestigation(){
 
 
 
-    document.getElementById(
-        "status"
-    )
+
+    document.getElementById("status")
     .innerHTML =
-    "👻 Ghost selected...";
+    "👻 Ghost found!";
 
 
 
 
 
-    setTimeout(()=>{
+
+    setTimeout(function(){
 
 
         window.location.href =
         "investigation.html";
 
 
-    },1000);
+    },800);
 
 
 
-}
+};
+
+
+
+};
 
 
 
 </script>
+
 
 
 </body>
