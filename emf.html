@@ -8,82 +8,110 @@
 <style>
 
 body {
-    background:black;
+    background:#050505;
     color:white;
     font-family:Arial;
     text-align:center;
-    padding-top:30px;
+    padding-top:25px;
 }
 
 
 h1 {
-    font-size:40px;
+    font-size:42px;
 }
 
 
 #device {
 
-    width:330px;
+    width:340px;
     margin:auto;
     background:#111;
-    border:6px solid #444;
-    border-radius:30px;
-    padding:20px;
+    border:6px solid #555;
+    border-radius:35px;
+    padding:25px;
+    box-shadow:0 0 30px black;
 
 }
+
 
 
 #screen {
 
-    height:150px;
-    background:#003300;
+    height:160px;
+
+    background:#001800;
+
     color:#00ff00;
-    font-size:60px;
-    border-radius:15px;
+
+    font-size:65px;
+
+    font-weight:bold;
+
+    border-radius:20px;
 
     display:flex;
+
     justify-content:center;
+
     align-items:center;
 
-    margin-bottom:25px;
+    transition:0.3s;
+
+    box-shadow:
+    0 0 20px #00ff00;
 
 }
 
 
-button {
 
-    font-size:20px;
-    padding:12px;
-    border-radius:15px;
+
+#status {
+
+    margin-top:20px;
+
+    font-size:25px;
 
 }
+
 
 
 #compass {
 
-    width:220px;
-    height:220px;
+    width:230px;
+
+    height:230px;
+
+    margin:35px auto;
+
     border:5px solid white;
+
     border-radius:50%;
-    margin:30px auto;
+
     position:relative;
+
     touch-action:none;
 
 }
 
 
+
 #needle {
 
     position:absolute;
-    top:20px;
-    left:105px;
 
-    width:10px;
-    height:90px;
+    width:8px;
+
+    height:100px;
 
     background:red;
 
+    left:111px;
+
+    top:15px;
+
     transform-origin:bottom;
+
+    border-radius:5px;
 
 }
 
@@ -91,17 +119,12 @@ button {
 
 #direction {
 
-    font-size:22px;
     color:#aaa;
 
-}
-
-
-#status {
-
-    font-size:25px;
+    font-size:20px;
 
 }
+
 
 
 </style>
@@ -136,15 +159,14 @@ Searching...
 </div>
 
 
+
 </div>
+
 
 
 <div id="direction">
 Direction: 0°
 </div>
-
-
-<audio id="beep" src="beep.mp3"></audio>
 
 
 
@@ -160,29 +182,30 @@ localStorage.getItem("currentGhost")
 
 let playerDirection = 0;
 
-
+let currentEMF = 0;
 
 let dragging = false;
 
 
 
-const compass =
+
+
+// Compass control
+
+let compass =
 document.getElementById("compass");
 
-const needle =
+
+let needle =
 document.getElementById("needle");
 
 
 
-
-
-// Compass dragging
-
 compass.addEventListener(
 "pointerdown",
-function(){
+()=>{
 
-    dragging=true;
+dragging=true;
 
 });
 
@@ -190,9 +213,9 @@ function(){
 
 window.addEventListener(
 "pointerup",
-function(){
+()=>{
 
-    dragging=false;
+dragging=false;
 
 });
 
@@ -203,7 +226,8 @@ window.addEventListener(
 function(e){
 
 
-if(!dragging) return;
+if(!dragging)
+return;
 
 
 
@@ -213,7 +237,7 @@ compass.getBoundingClientRect();
 
 
 let x =
-e.clientX - 
+e.clientX -
 (rect.left + rect.width/2);
 
 
@@ -227,8 +251,7 @@ e.clientY -
 let angle =
 Math.atan2(y,x)
 *
-180
-/
+180 /
 Math.PI;
 
 
@@ -238,16 +261,13 @@ angle + 90;
 
 
 
-if(playerDirection < 0){
-
-    playerDirection += 360;
-
-}
+if(playerDirection < 0)
+playerDirection += 360;
 
 
 
 needle.style.transform =
-"rotate(" 
+"rotate("
 +
 playerDirection
 +
@@ -264,8 +284,8 @@ Math.round(playerDirection)
 "°";
 
 
-
 });
+
 
 
 
@@ -274,11 +294,8 @@ Math.round(playerDirection)
 function facingGhost(){
 
 
-if(!ghost){
-
+if(!ghost)
 return false;
-
-}
 
 
 
@@ -293,7 +310,7 @@ ghost.direction
 if(difference > 180){
 
 difference =
-360-difference;
+360 - difference;
 
 }
 
@@ -302,8 +319,8 @@ difference =
 return difference < 35;
 
 
-
 }
+
 
 
 
@@ -327,12 +344,13 @@ ghost.evidence.includes(
 ){
 
 
-if(Math.random() < 0.15){
+if(
+Math.random() < 0.15
+){
 
 return 5;
 
 }
-
 
 }
 
@@ -349,11 +367,12 @@ Math.random()*4
 
 
 
-function beep(level){
 
 
-let sound =
-document.getElementById("beep");
+
+// Sound generator
+
+function makeBeep(level){
 
 
 if(level <= 0)
@@ -361,38 +380,64 @@ return;
 
 
 
-sound.play();
-
-
-let delay =
-1500 -
-(level * 250);
+let audio =
+new AudioContext();
 
 
 
-setTimeout(function(){
+let oscillator =
+audio.createOscillator();
 
 
-if(currentEMF === level){
 
-beep(level);
+let gain =
+audio.createGain();
+
+
+
+oscillator.type =
+"square";
+
+
+
+// Higher level = higher pitch
+
+oscillator.frequency.value =
+250 + (level * 180);
+
+
+
+gain.gain.value =
+0.08;
+
+
+
+oscillator.connect(gain);
+
+gain.connect(
+audio.destination
+);
+
+
+
+oscillator.start();
+
+
+
+oscillator.stop(
+audio.currentTime + 0.12
+);
+
+
 
 }
 
 
-},delay);
 
 
 
-}
 
-
-
-let currentEMF = 0;
-
-
-
-function update(){
+function updateEMF(){
 
 
 
@@ -413,31 +458,19 @@ currentEMF;
 
 
 
-if(currentEMF === 0){
-
-screen.style.color =
+let colour =
 "#00ff00";
 
-screen.style.background =
-"#003300";
-
-}
-
-
-
-if(currentEMF === 1){
-
-screen.style.color =
-"lime";
-
-}
+let glow =
+"0 0 20px #00ff00";
 
 
 
 if(currentEMF === 2){
 
-screen.style.color =
-"yellow";
+colour="yellow";
+
+glow="0 0 30px yellow";
 
 }
 
@@ -445,8 +478,9 @@ screen.style.color =
 
 if(currentEMF === 3){
 
-screen.style.color =
-"orange";
+colour="orange";
+
+glow="0 0 35px orange";
 
 }
 
@@ -454,8 +488,9 @@ screen.style.color =
 
 if(currentEMF === 4){
 
-screen.style.color =
-"red";
+colour="red";
+
+glow="0 0 45px red";
 
 }
 
@@ -463,34 +498,67 @@ screen.style.color =
 
 if(currentEMF === 5){
 
+colour="white";
+
+glow="0 0 60px red";
+
+screen.style.background="#990000";
+
+}
+
+else{
+
+screen.style.background="#001800";
+
+}
+
+
+
 screen.style.color =
-"white";
+colour;
 
-screen.style.background =
-"red";
+
+screen.style.boxShadow =
+glow;
+
+
+
+if(currentEMF > 0){
+
+document.getElementById("status")
+.innerHTML =
+"⚠️ Signal Detected";
+
+makeBeep(currentEMF);
+
+}
+
+else{
+
+document.getElementById("status")
+.innerHTML =
+"Searching...";
 
 }
 
 
 
-beep(currentEMF);
+let delay =
+Math.random()*1200+500;
 
 
 
-let wait =
-Math.random()*1500+700;
-
-
-
-setTimeout(update,wait);
-
+setTimeout(
+updateEMF,
+delay
+);
 
 
 }
 
 
 
-update();
+updateEMF();
 
 
 
