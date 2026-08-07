@@ -3,153 +3,283 @@
 
 <head>
 
-<meta charset="UTF-8">
-<title>Spirit Investigation</title>
+<title>Ghost Hunter</title>
 
 <style>
 
 body {
-    background: radial-gradient(circle, #222 0%, #000 70%);
-    color: white;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    margin-top: 100px;
+
+    background:#050505;
+    color:white;
+    font-family:Arial, sans-serif;
+    text-align:center;
+    padding-top:40px;
+
 }
+
 
 h1 {
-    font-size: 55px;
-    letter-spacing: 3px;
-    text-shadow: 0 0 15px white;
+
+    font-size:50px;
+    text-shadow:0 0 25px white;
+
 }
 
-.subtitle {
-    font-size: 22px;
-    color: #aaa;
-    margin-bottom: 50px;
+
+
+p {
+
+    color:#aaa;
+    font-size:22px;
+
 }
+
+
 
 button {
-    background: #111;
-    color: white;
-    border: 2px solid white;
-    border-radius: 12px;
-    padding: 20px 50px;
-    font-size: 28px;
-    cursor: pointer;
-    transition: 0.3s;
+
+    background:#111;
+
+    color:white;
+
+    border:2px solid #555;
+
+    border-radius:20px;
+
+    padding:20px 40px;
+
+    font-size:25px;
+
+    cursor:pointer;
+
+    margin-top:30px;
+
 }
+
+
 
 button:hover {
-    background: white;
-    color: black;
-    transform: scale(1.05);
+
+    background:#333;
+
+    box-shadow:0 0 25px white;
+
 }
 
-.box {
-    border: 1px solid #444;
-    padding: 40px;
-    width: 60%;
-    margin: auto;
-    border-radius: 20px;
-    background: rgba(0,0,0,0.7);
+
+
+#ghostInfo {
+
+    margin:30px auto;
+
+    color:#777;
+
+    font-size:18px;
+
 }
 
-footer {
-    margin-top: 60px;
-    color: #555;
-}
+
 
 </style>
 
 </head>
 
 
+
 <body>
 
 
-<audio id="backgroundNoise" autoplay loop muted>
 
-    <source src="ambience.mp3" type="audio/mpeg">
-
-</audio>
+<h1>👻 Ghost Hunter</h1>
 
 
+<p>
 
-<div class="box">
+Enter the investigation
+
+</p>
 
 
-<h1>👻 Spirit Investigation</h1>
-
-
-<div class="subtitle">
-Enter the darkness. Find the evidence.
-</div>
 
 
 <button onclick="startInvestigation()">
+
 Start Investigation
+
 </button>
 
+
+
+<div id="ghostInfo">
 
 </div>
 
 
 
-<footer>
-Experimental Ghost Hunting System
-</footer>
 
-<script src="ghosts.js"></script>
 
 <script>
 
-const audio = document.getElementById("backgroundNoise");
-
-audio.volume = 0.15;
 
 
-// Try autoplay
-audio.play();
+const ghosts = [
 
 
-// Browser unlocks sound after first click
-document.addEventListener("click", function(){
+{
 
-    audio.muted = false;
-    audio.play();
+name:"Wraith",
 
-}, { once: true });
+evidence:[
+"EMF Level 5",
+"Spirit Box",
+"DOTS"
+]
+
+},
+
+
+
+{
+
+name:"Phantom",
+
+evidence:[
+"Spirit Box",
+"UV",
+"DOTS"
+]
+
+},
+
+
+
+{
+
+name:"Banshee",
+
+evidence:[
+"EMF Level 5",
+"DOTS",
+"UV"
+]
+
+},
+
+
+
+{
+
+name:"Shade",
+
+evidence:[
+"EMF Level 5",
+"Ghost Writing",
+"Freezing Temps"
+]
+
+},
+
+
+
+{
+
+name:"Demon",
+
+evidence:[
+"Freezing Temps",
+"Ghost Writing",
+"UV"
+]
+
+}
+
+
+
+];
+
+
+
+
+
 
 
 
 function startInvestigation(){
 
+
+
 let chosenGhost =
-ghosts[Math.floor(Math.random() * ghosts.length)];
-
-chosenGhost.direction = Math.floor(Math.random() * 360);
-
-distance: Number(
-(Math.random() * 1.4 + 0.1).toFixed(1)
-
-
+ghosts[
+Math.floor(
+Math.random()*ghosts.length
 )
+];
+
+
+
+
+
+let currentGhost = {
+
+
+name:
+chosenGhost.name,
+
+
+evidence:
+chosenGhost.evidence,
+
+
+
+direction:
+Math.floor(
+Math.random()*360
+),
+
+
+
+distance:
+Number(
+(Math.random()*1.4+0.1)
+.toFixed(1)
+)
+
+
+
+};
+
+
+
+
+
+
+
 localStorage.setItem(
+
 "currentGhost",
-JSON.stringify(chosenGhost)
+
+JSON.stringify(currentGhost)
+
 );
 
-location.href = "investigation.html";
+
+
+
+
+location.href =
+"investigation.html";
+
 
 
 }
 
-}
 
-}
+
 
 
 </script>
+
+
 
 
 </body>
