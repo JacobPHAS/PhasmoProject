@@ -31,7 +31,10 @@ body {
 <button onclick="enableSensors()">
 Enable Compass
 </button>
-    
+  
+    <button onclick="startCompass()">
+Start Compass
+</button>
 <div id="emf">
 EMF 0
 </div>
@@ -42,6 +45,17 @@ Phone direction: waiting...
 
 <script>
 
+function startCompass(){
+
+    window.addEventListener("deviceorientation", function(event){
+
+        document.getElementById("direction").innerHTML =
+        "Alpha: " + event.alpha;
+
+    });
+
+}
+    
 window.addEventListener("deviceorientation", function(event){
 
     document.getElementById("direction").innerHTML =
