@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Spirit Box</title>
+
+<style>
+
+body {
+    background: black;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin-top: 80px;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+button {
+    font-size: 24px;
+    padding: 15px 35px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#status, #heard, #reply {
+    margin: 25px;
+    font-size: 25px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>🎤 Spirit Box</h1>
+
+
+<audio id="staticNoise" loop>
+    <source src="static.mp3" type="audio/mpeg">
+</audio>
+
+
+
+<button id="button" onclick="toggleSpiritBox()">
+Turn On
+</button>
+
+
+
+<div id="status">
+Status: Off
+</div>
+
+
+<div id="heard">
+Heard: Waiting...
+</div>
+
+
+<div id="reply"></div>
+
+
+
+
+
+<script>
+
+
+const responses = {
+
+
+"are you here": [
+    "Yes.",
+    "I am here.",
+    "Hello.",
+    "I hear you."
+],
+
+
+"where are you": [
+    "Nearby.",
+    "Close.",
+    "Behind you."
+],
+
+
+"how old are you": [
+    "I don't remember.",
+    "Very old.",
+    "A long time ago."
+],
+
+
+"can you talk to us": [
+    "Yes.",
+    "I can hear you."
+],
+
+
+"give us a sign": [
+    "Look.",
+    "Listen.",
+    "Soon."
+],
+
+
+"do you want to hurt us": [
+    "No.",
+    "Never.",
+    "I mean no harm."
+]
+
+
+};
+
+
+
+let spiritBoxOn = false;
+let spiritActive = false;
+
+
+const button = document.getElementById("button");
+const noise = document.getElementById("staticNoise");
+
+
+
+
+
+function toggleSpiritBox(){
+
+
+    if(!spiritBoxOn){
+
+
+        spiritBoxOn = true;
+
+        button.innerHTML = "Turn Off";
+
+
+        noise.volume = 0.15;
+
+        noise.play();
+
+
+
+        let ghost = JSON.parse(
+            localStorage.getItem("currentGhost")
+        );
+
+
+
+        if(ghost){
+
+            spiritActive =
+            ghost.evidence.includes("Spirit Box");
+
+        }
+
+        else{
+
+            spiritActive = false;
+
+        }
+
+
+
+        document.getElementById("status").innerHTML =
+        "Status: Active";
+
+
+
+        listen();
+
+
+    }
+
+
+
+    else{
+
+
+        spiritBoxOn = false;
+
+
+        button.innerHTML = "Turn On";
+
+
+        noise.pause();
+
+
+        document.getElementById("status").innerHTML =
+        "Status: Off";
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+function listen(){
+
+
+    if(!spiritBoxOn){
+
+        return;
+
+    }
+
+
+
+
+    const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+
+    if(!SpeechRecognition){
+
+        alert("Speech recognition is not supported");
+
+        return;
+
+    }
+
+
+
+    let recognition =
+    new SpeechRecognition();
+
+
+
+    recognition.lang = "en-GB";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+
+
+
+    document.getElementById("heard").innerHTML =
+    "Listening...";
+
+
+
+    recognition.start();
+
+
+
+
+
+    recognition.onresult = function(event){
+
+
+
+        let text =
+        event.results[0][0]
+        .transcript
+        .toLowerCase();
+
+
+
+        document.getElementById("heard").innerHTML =
+        "Heard: " + text;
+
+
+
+        document.getElementById("reply").innerHTML = "";
+
+
+
+
+        if(spiritActive){
+
+
+
+            for(let question in responses){
+
+
+
+                if(text.includes(question)){
+
+
+
+                    // 1 in 3 chance to answer
+                    if(Math.random() <= 1/3){
+
+
+
+                        let answer =
+                        responses[question]
+                        [
+                        Math.floor(
+                        Math.random() *
+                        responses[question].length
+                        )
+                        ];
+
+
+
+                        sayReply(answer);
+
+
+                    }
+
+
+                    break;
+
+
+                }
+
+
+            }
+
+
+        }
+
+
+
+
+        restartListening();
+
+
+    };
+
+
+
+
+
+    recognition.onerror = function(){
+
+
+        restartListening();
+
+
+    };
+
+
+}
+
+
+
+
+
+
+function restartListening(){
+
+
+    setTimeout(()=>{
+
+
+        if(spiritBoxOn){
+
+            listen();
+
+        }
+
+
+    },500);
+
+
+}
+
+
+
+
+
+
+
+function sayReply(answer){
+
+
+    document.getElementById("reply").innerHTML =
+    "Response: " + answer;
+
+
+
+    let voice =
+    new SpeechSynthesisUtterance(answer);
+
+
+
+    voice.rate = 0.9;
+
+
+
+    speechSynthesis.speak(voice);
+
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
