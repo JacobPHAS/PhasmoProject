@@ -1,0 +1,149 @@
+let ghost =
+JSON.parse(
+localStorage.getItem("currentGhost")
+);
+
+
+let temperature = 20;
+
+
+
+function calculateTargetTemperature(){
+
+
+if(!ghost){
+    return 20;
+}
+
+
+// base temperature
+
+let target = 20;
+
+
+
+// closer = colder
+
+if(ghost.distance <= 0.3){
+
+    target = 5;
+
+}
+
+else if(ghost.distance <= 0.7){
+
+    target = 10;
+
+}
+
+else if(ghost.distance <= 1.2){
+
+    target = 15;
+
+}
+
+
+
+// freezing ghost
+
+if(
+ghost.evidence.includes("Freezing Temps")
+&&
+ghost.distance <= 0.8
+){
+
+    target = -5;
+
+}
+
+
+
+return target;
+
+
+}
+
+
+
+
+
+function updateTemperature(){
+
+
+ghost =
+JSON.parse(
+localStorage.getItem("currentGhost")
+);
+
+
+
+let target =
+calculateTargetTemperature();
+
+
+// gradual change
+
+temperature +=
+(target-temperature)*0.05;
+
+
+
+let display =
+temperature.toFixed(1);
+
+
+
+document.getElementById("screen")
+.innerHTML =
+display+"°C";
+
+
+
+
+if(temperature <= 0){
+
+
+document.getElementById("status")
+.innerHTML =
+"❄ FREEZING TEMPERATURES";
+
+
+document.getElementById("screen")
+.style.color="cyan";
+
+
+}
+
+else if(temperature < 10){
+
+
+document.getElementById("status")
+.innerHTML =
+"Cold air detected";
+
+
+}
+
+else{
+
+
+document.getElementById("status")
+.innerHTML =
+"Scanning...";
+
+
+}
+
+
+
+setTimeout(
+updateTemperature,
+1000
+);
+
+
+}
+
+
+
+updateTemperature();
