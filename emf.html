@@ -8,72 +8,59 @@
 <style>
 
 body {
-    background:#050505;
+    background:black;
     color:white;
     font-family:Arial;
     text-align:center;
     padding-top:40px;
 }
 
-
 h1 {
-    font-size:42px;
+    font-size:40px;
 }
 
-
-#emfDevice {
-
+#device {
     width:330px;
-    height:450px;
+    height:500px;
     margin:auto;
-    background:#151515;
-    border:6px solid #333;
+    background:#111;
+    border:6px solid #444;
     border-radius:30px;
     padding:20px;
-
 }
-
 
 #screen {
-
-    height:150px;
-    background:#001a00;
-    border-radius:15px;
+    height:160px;
+    background:#001900;
     color:#00ff00;
-    font-size:65px;
+    font-size:60px;
     display:flex;
-    align-items:center;
     justify-content:center;
-    margin-bottom:30px;
-
+    align-items:center;
+    border-radius:15px;
+    margin-bottom:25px;
 }
-
 
 button {
-
     font-size:24px;
-    padding:15px 25px;
+    padding:15px;
+    margin:10px;
     border-radius:15px;
-
 }
 
+#direction {
+    font-size:25px;
+    margin-top:20px;
+}
 
 #status {
-
-    margin-top:25px;
     font-size:25px;
-
+    margin-top:20px;
 }
 
-
-#debug {
-
-    margin-top:30px;
-    color:#aaa;
-    font-size:18px;
-
+#manual {
+    display:none;
 }
-
 
 </style>
 
@@ -86,7 +73,7 @@ button {
 <h1>📟 EMF Reader</h1>
 
 
-<div id="emfDevice">
+<div id="device">
 
 
 <div id="screen">
@@ -94,21 +81,31 @@ EMF 0
 </div>
 
 
-<button onclick="startSensors()">
-Start Sensor
+<div id="status">
+Checking sensors...
+</div>
+
+
+<div id="manual">
+
+<h2>Manual Turning</h2>
+
+<button onclick="turnLeft()">
+⬅ Left
 </button>
 
-
-<div id="status">
-Waiting...
-</div>
-
+<button onclick="turnRight()">
+Right ➡
+</button>
 
 </div>
 
 
-<div id="debug">
-No sensor data
+</div>
+
+
+<div id="direction">
+Direction: 0°
 </div>
 
 
@@ -116,8 +113,7 @@ No sensor data
 <script>
 
 
-let ghost =
-JSON.parse(
+let ghost = JSON.parse(
 localStorage.getItem("currentGhost")
 );
 
@@ -125,61 +121,93 @@ localStorage.getItem("currentGhost")
 
 let phoneDirection = 0;
 
-let sensorStarted = false;
+let compassWorking = false;
 
 
 
+// Check compass
 
-function startSensors(){
-
-
-    sensorStarted = true;
-
-
-    window.addEventListener(
-    "deviceorientation",
-    function(event){
+window.addEventListener(
+"deviceorientation",
+function(event){
 
 
-        if(event.alpha !== null){
+    if(event.alpha !== null){
+
+        compassWorking = true;
+
+        phoneDirection = event.alpha;
 
 
-            phoneDirection =
-            event.alpha;
+    }
 
 
-
-            document.getElementById("debug")
-            .innerHTML =
-
-            "Phone direction: "
-            +
-            Math.round(phoneDirection)
-
-            +
-
-            "<br>Ghost direction: "
-            +
-            (ghost ? ghost.direction : "none");
+});
 
 
 
-        }
+// Give manual mode time to detect compass
+
+setTimeout(function(){
 
 
-    });
+    if(!compassWorking){
+
+
+        document.getElementById("manual")
+        .style.display="block";
+
+
+        document.getElementById("status")
+        .innerHTML =
+        "Manual mode";
+
+
+    }
+    else {
+
+
+        document.getElementById("status")
+        .innerHTML =
+        "Compass mode";
+
+
+    }
+
+
+},3000);
 
 
 
-    document.getElementById("status")
-    .innerHTML =
-    "Sensor started";
+// Manual controls
+
+function turnLeft(){
+
+    phoneDirection -= 30;
+
+
+    if(phoneDirection < 0){
+        phoneDirection += 360;
+    }
 
 }
 
 
 
+function turnRight(){
 
+    phoneDirection += 30;
+
+
+    if(phoneDirection >= 360){
+        phoneDirection -= 360;
+    }
+
+}
+
+
+
+// Check direction
 
 function facingGhost(){
 
@@ -189,13 +217,11 @@ function facingGhost(){
     }
 
 
-
     let difference =
     Math.abs(
-        phoneDirection -
-        ghost.direction
+    phoneDirection -
+    ghost.direction
     );
-
 
 
     if(difference > 180){
@@ -206,18 +232,15 @@ function facingGhost(){
     }
 
 
-
-    return difference < 35;
-
+    return difference <= 35;
 
 }
 
 
 
-
+// EMF calculation
 
 function getEMF(){
-
 
 
     if(!facingGhost()){
@@ -228,55 +251,53 @@ function getEMF(){
 
 
 
-
     if(
-    ghost.evidence.includes("EMF Level 5")
+    ghost.evidence.includes(
+    "EMF Level 5")
     ){
 
 
-
-        if(
-        Math.random() < 0.15
-        ){
+        if(Math.random() < 0.15){
 
             return 5;
 
         }
 
-
     }
 
 
 
-    return (
-    Math.floor(
+    return Math.floor(
     Math.random()*4
-    )
-    +1
-    );
+    )+1;
 
 
 }
 
 
 
-
+// Update display
 
 setInterval(function(){
 
 
-
-    let reading =
+    let emf =
     getEMF();
-
 
 
     document.getElementById("screen")
     .innerHTML =
-    "EMF "
-    +
-    reading;
+    "EMF " + emf;
 
+
+
+    document.getElementById("direction")
+    .innerHTML =
+    "Direction: "
+    +
+    Math.round(phoneDirection)
+    +
+    "°";
 
 
 },1000);
