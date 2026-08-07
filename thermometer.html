@@ -190,29 +190,43 @@ Scanning...
 
 <script>
 
-
 let ghost = JSON.parse(
     localStorage.getItem("currentGhost")
 );
 
 
-// Add distance if missing
-
-
-
-
-    localStorage.setItem(
-        "currentGhost",
-        JSON.stringify(ghost)
-    );
-
-}
-
-
-
 let temperature = 20;
 
 
+
+function isFacingGhost(){
+
+    if(!ghost){
+        return false;
+    }
+
+
+    if(typeof playerDirection === "undefined"){
+        return false;
+    }
+
+
+    let difference =
+    Math.abs(
+        playerDirection - ghost.direction
+    );
+
+
+    if(difference > 180){
+
+        difference = 360 - difference;
+
+    }
+
+
+    return difference < 45;
+
+}
 
 
 
@@ -221,72 +235,40 @@ let temperature = 20;
 function getTargetTemperature(){
 
 
-
-if(!ghost){
-
-return 20;
-
-}
+    let facing =
+    isFacingGhost();
 
 
 
-let distance =
-ghost.distance || 1.5;
+    // Not looking at ghost
+
+    if(!facing){
+
+        return 15;
+
+    }
 
 
 
-let target = 20;
+    // Looking at ghost
+
+    if(
+        ghost.evidence.includes(
+            "Freezing Temps"
+        )
+    ){
+
+        return -5;
+
+    }
 
 
+    // Normal ghost
 
-// closer ghost = colder
-
-
-if(distance <= 0.3){
-
-target = 6;
-
-}
-
-else if(distance <= 0.7){
-
-target = 10;
-
-}
-
-else if(distance <= 1.2){
-
-target = 15;
-
-}
-
-
-
-
-
-// freezing ghost
-
-if(
-ghost.evidence.includes(
-"Freezing Temps"
-)
-&&
-distance <= 0.8
-){
-
-target = -5;
-
-}
-
-
-
-return target;
-
+    return 10;
 
 
 }
-
-
 
 
 
@@ -298,159 +280,73 @@ function updateThermometer(){
 
 
 
-ghost =
-JSON.parse(
-localStorage.getItem("currentGhost")
-);
+    ghost = JSON.parse(
+        localStorage.getItem("currentGhost")
+    );
 
 
 
-let target =
-getTargetTemperature();
+    let target =
+    getTargetTemperature();
 
 
 
-// gradual movement
+    // gradual temperature movement
 
-temperature +=
-(target - temperature) * 0.05;
-
-
-
-let screen =
-document.getElementById("screen");
+    temperature +=
+    (target - temperature) * 0.05;
 
 
 
-screen.innerHTML =
-temperature.toFixed(1)
-+
-"°C";
+    document.getElementById("screen")
+    .innerHTML =
+    temperature.toFixed(1)
+    +
+    "°C";
 
 
 
 
+    if(temperature <= 0){
 
 
-// tube animation
+        document.getElementById("status")
+        .innerHTML =
+        "❄ FREEZING TEMPERATURES";
 
 
-let height =
-Math.max(
-10,
-Math.min(
-100,
-temperature * 5
-)
-);
+    }
+
+    else if(temperature < 15){
+
+
+        document.getElementById("status")
+        .innerHTML =
+        "🥶 Cold air detected";
+
+
+    }
+
+    else{
+
+
+        document.getElementById("status")
+        .innerHTML =
+        "Scanning...";
+
+
+    }
 
 
 
-document.getElementById("liquid")
-.style.height =
-height+"%";
 
-
-
-
-
-
-
-
-if(temperature <= 0){
-
-
-screen.style.color="#66ccff";
-
-screen.style.boxShadow=
-"0 0 60px cyan";
-
-
-document.getElementById("status")
-.innerHTML =
-"❄ FREEZING TEMPERATURES";
-
+    setTimeout(
+        updateThermometer,
+        1000
+    );
 
 
 }
-
-else if(temperature < 10){
-
-
-
-screen.style.color="cyan";
-
-
-document.getElementById("status")
-.innerHTML =
-"🥶 Very cold air detected";
-
-
-
-}
-
-else{
-
-
-screen.style.color="white";
-
-
-screen.style.boxShadow=
-"0 0 30px cyan";
-
-
-document.getElementById("status")
-.innerHTML =
-"Scanning...";
-
-
-}
-
-
-
-
-
-// testing information
-
-
-if(ghost){
-
-
-document.getElementById("debug")
-.innerHTML =
-
-"🧪 Testing Mode"
-+
-"<br>Ghost: "
-+
-ghost.name
-+
-"<br>Distance: "
-+
-ghost.distance
-+
-"m"
-+
-"<br>Evidence: "
-+
-ghost.evidence.join(", ");
-
-
-
-}
-
-
-
-
-setTimeout(
-updateThermometer,
-1000
-);
-
-
-
-}
-
 
 
 
@@ -458,11 +354,4 @@ updateThermometer,
 updateThermometer();
 
 
-
 </script>
-
-
-
-</body>
-
-</html>
